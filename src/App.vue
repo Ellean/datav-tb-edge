@@ -1,32 +1,47 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view />
-  </div>
+  <dvFullScreenContainer>
+    <HeaderBar></HeaderBar>
+    <MainBlock></MainBlock>
+  </dvFullScreenContainer>
 </template>
 
+<script>
+import HeaderBar from "./components/HeaderBlock.vue";
+import MainBlock from "./components/MainBlock.vue";
+
+export default {
+  name: "App",
+  components: { HeaderBar, MainBlock },
+  data() {
+    return {};
+  },
+  mounted() {},
+};
+</script>
+
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+@import "@/assets/qweather-icons.css";
+
+body {
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-family: "Source Han Sans CN", sans-serif;
+  background-color: #001763;
 }
 
-nav {
-  padding: 30px;
+.dv-border-box-11 {
+  box-sizing: border-box;
+  padding: calc(5vh + 12px) 24px 24px 24px;
+}
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+[class$="-en"] {
+  font-size: 0.9rem;
+  font-weight: 100;
+  opacity: 0.5;
+}
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+[class$="-zh"] {
+  font-size: 1.2rem;
 }
 </style>

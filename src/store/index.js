@@ -4,7 +4,10 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
+  state: {
+    color: ["#235FA7", "#4FD2DD"],
+    reversedColor: ["#4FD2DD", "#235FA7"],
+  },
   getters: {},
   mutations: {},
   actions: {},

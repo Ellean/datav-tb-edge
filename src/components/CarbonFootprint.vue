@@ -2,40 +2,133 @@
   <div class="grid">
     <div class="water"></div>
     <div class="water-zh">本日节水量</div>
-    <div class="water-en">Water Saved (Today)}</div>
-    <div class="water-value">{{ water }} m³</div>
+    <div class="water-en">Water Saved (Today)</div>
+    <div class="water-value">{{ waterDisplay }}</div>
     <div class="water-monthly"></div>
     <div class="water-monthly-zh">本月节水量</div>
     <div class="water-monthly-en">Water Saved (Month)</div>
-    <div class="water-monthly-value">{{ waterMonthly }} m³</div>
+    <div class="water-monthly-value">{{ waterMonthlyDisplay }}</div>
     <div class="carbon"></div>
     <div class="carbon-zh">本日减碳量</div>
     <div class="carbon-en">Ammonia</div>
-    <div class="carbon-value">{{ carbon }} KG</div>
+    <div class="carbon-value">{{ carbonDisplay }}</div>
     <div class="carbon-monthly"></div>
     <div class="carbon-monthly-zh">本月减碳量</div>
     <div class="carbon-monthly-en">Hydrogen sulfide</div>
-    <div class="carbon-monthly-value">{{ carbonMonthly }} T</div>
+    <div class="carbon-monthly-value">{{ carbonMonthlyDisplay }}</div>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
+import {
+  getCurrentDateParts,
+  countTypeDay,
+  countTypeMonth,
+} from "@/utils/visitorStats";
 
 export default {
   name: "CarbonFootprint",
   data() {
     return {
-      water: "23.4",
-      waterMonthly: "88",
-      carbon: "1468",
-      carbonMonthly: "28.76",
+      // 原始数据，water单位g，carbon单位L
+      rawWater: 0,
+      rawWaterMonthly: 0,
+      rawCarbon: 0,
+      rawCarbonMonthly: 0,
     };
   },
-  computed: mapState({
-    color: "color",
-    reversedColor: "reversedColor",
-  }),
+  computed: {
+    ...mapState({
+      color: "color",
+      reversedColor: "reversedColor",
+    }),
+    ...mapGetters(["visitorCount"]),
+    todayToilet() {
+      const { year, month, date } = getCurrentDateParts();
+      return countTypeDay(this.visitorCount, year, month, date, "toilet");
+    },
+    todayUrinal() {
+      const { year, month, date } = getCurrentDateParts();
+      return countTypeDay(this.visitorCount, year, month, date, "urinal");
+    },
+    monthToilet() {
+      const { year, month } = getCurrentDateParts();
+      return countTypeMonth(this.visitorCount, year, month, "toilet");
+    },
+    monthUrinal() {
+      const { year, month } = getCurrentDateParts();
+      return countTypeMonth(this.visitorCount, year, month, "urinal");
+    },
+    carbonMonthly() {
+      return (this.rawCarbonMonthly / 1000000).toFixed(4);
+    },
+    waterDisplay() {
+      // 升->立方米
+      if (this.rawWater >= 1000) {
+        return (this.rawWater / 1000).toFixed(3) + " m³";
+      } else if (this.rawWater > 0) {
+        return this.rawWater.toFixed(0) + " L";
+      } else {
+        return "-";
+      }
+    },
+    waterMonthlyDisplay() {
+      if (this.rawWaterMonthly >= 1000) {
+        return (this.rawWaterMonthly / 1000).toFixed(3) + " m³";
+      } else if (this.rawWaterMonthly > 0) {
+        return this.rawWaterMonthly.toFixed(0) + " L";
+      } else {
+        return "-";
+      }
+    },
+    carbonDisplay() {
+      // 克->千克
+      if (this.rawCarbon >= 1000000) {
+        return (this.rawCarbon / 1000000).toFixed(3) + " t";
+      } else if (this.rawCarbon >= 1000) {
+        return (this.rawCarbon / 1000).toFixed(2) + " kg";
+      } else if (this.rawCarbon > 0) {
+        return this.rawCarbon.toFixed(0) + " g";
+      } else {
+        return "-";
+      }
+    },
+    carbonMonthlyDisplay() {
+      if (this.rawCarbonMonthly >= 1000000) {
+        return (this.rawCarbonMonthly / 1000000).toFixed(3) + " t";
+      } else if (this.rawCarbonMonthly >= 1000) {
+        return (this.rawCarbonMonthly / 1000).toFixed(2) + " kg";
+      } else if (this.rawCarbonMonthly > 0) {
+        return this.rawCarbonMonthly.toFixed(0) + " g";
+      } else {
+        return "-";
+      }
+    },
+  },
+  watch: {
+    visitorCount: {
+      handler() {
+        // 计算节水量和减碳量
+        const WATER_SAVED = { toilet: 6, urinal: 2 };
+        const CARBON_SAVED = { toilet: 2.06, urinal: 0.69 };
+        this.rawWater =
+          this.todayToilet * WATER_SAVED.toilet +
+          this.todayUrinal * WATER_SAVED.urinal;
+        this.rawWaterMonthly =
+          this.monthToilet * WATER_SAVED.toilet +
+          this.monthUrinal * WATER_SAVED.urinal;
+        this.rawCarbon =
+          this.todayToilet * CARBON_SAVED.toilet +
+          this.todayUrinal * CARBON_SAVED.urinal;
+        this.rawCarbonMonthly =
+          this.monthToilet * CARBON_SAVED.toilet +
+          this.monthUrinal * CARBON_SAVED.urinal;
+      },
+      immediate: true,
+      deep: true,
+    },
+  },
 };
 </script>
 
@@ -44,7 +137,7 @@ export default {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: 50px 1fr 1fr;
+  grid-template-columns: 50px 1.5fr 1fr;
   grid-template-rows: 30px 30px 30px 30px 30px 30px 30px 30px;
   gap: 12px 12px;
   grid-template-areas:

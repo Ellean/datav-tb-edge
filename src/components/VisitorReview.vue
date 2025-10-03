@@ -14,9 +14,9 @@ export default {
   name: "VisitorReview",
   data() {
     return {
-      good: 91,
-      moderate: 8,
-      bad: 1,
+      good: 100,
+      moderate: 0,
+      bad: 0,
     };
   },
 };

@@ -21,9 +21,9 @@
       </div>
     </div>
     <div class="center">
-      <div class="status-map">
+      <div class="state-map">
         <dvBorderBox8>
-          <StateMap></StateMap>
+          <StateMap :height="stateMapHeight" :width="stateMapWidth"></StateMap>
         </dvBorderBox8>
       </div>
       <div class="info">
@@ -82,6 +82,8 @@ export default {
   data() {
     return {
       currentDate: "",
+      stateMapWidth: 0,
+      stateMapHeight: 0,
     };
   },
   computed: mapState({
@@ -100,6 +102,15 @@ export default {
         second: "2-digit",
       }).format(now);
     }, 1000);
+
+    this.$nextTick(() => {
+      const stateMapEl = this.$el.querySelector(".state-map");
+      if (stateMapEl) {
+        const { width, height } = stateMapEl.getBoundingClientRect();
+        this.stateMapHeight = height;
+        this.stateMapWidth = width;
+      }
+    });
   },
 };
 </script>
@@ -118,7 +129,7 @@ export default {
   .left,
   .right,
   .center {
-    width: 25%;
+    width: 20%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -132,7 +143,7 @@ export default {
       width: 100%;
     }
     .ads {
-      aspect-ratio: 16 / 9;
+      height: 35vh;
       background: center / 120px url("@/assets/icons/ads-bg.png") no-repeat;
     }
   }
@@ -153,20 +164,24 @@ export default {
       }
     }
 
-    .status-map,
+    .state-map,
     .info {
       width: 100%;
       height: 40vh;
       position: relative;
     }
 
-    .status-map {
-      width: 70vw;
+    .state-map {
+      width: 76vw;
     }
 
     .info {
       height: 16vh;
     }
+  }
+
+  .right {
+    width: 40%;
   }
 }
 </style>

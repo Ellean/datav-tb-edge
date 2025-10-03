@@ -12,11 +12,42 @@
       </div>
     </div>
     <div class="temp">
-      <div>温度 <span class="condition-en">Temp.</span></div>
-      <div class="temp-value">{{ weatherTemp }} ℃</div>
+      <div
+        :style="{
+          color:
+            weatherTemp > 27
+              ? '#DF5954'
+              : weatherTemp < 15
+              ? '#74D0DB'
+              : '#FFFFFF',
+        }"
+      >
+        <i
+          :class="`qi-${
+            weatherTemp > 27 ? '1009' : weatherTemp < 15 ? '1008' : ''
+          }`"
+        ></i>
+        温度
+        <span class="condition-en">Temp.</span>
+      </div>
+      <div
+        class="temp-value"
+        :style="{
+          color:
+            weatherTemp > 27
+              ? '#DF5954'
+              : weatherTemp < 15
+              ? '#74D0DB'
+              : '#FFFFFF',
+        }"
+      >
+        {{ weatherTemp }} ℃
+      </div>
     </div>
     <div class="humid">
-      <div>湿度 <span class="condition-en">Humid.</span></div>
+      <div>
+        <i class="qi-2120"></i>湿度 <span class="condition-en">Humid.</span>
+      </div>
       <div class="humid-value">{{ weatherHumid }} %</div>
     </div>
   </div>
@@ -86,7 +117,10 @@ export default {
     width: fit-content;
   }
 
-  div {
+  .city,
+  .condition,
+  .temp,
+  .humid {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -101,7 +135,7 @@ export default {
   [class$="-value"] {
     font-size: 1.2rem;
     font-weight: 900;
-    color: #4fd2dd;
+    color: #ffffff;
     text-align: center;
   }
 }

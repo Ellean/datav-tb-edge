@@ -1,15 +1,134 @@
 import Vue from "vue";
 import Vuex from "vuex";
 
+import { parseVisitorCount } from "@/utils/visitorStats";
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     color: ["#235FA7", "#4FD2DD"],
     reversedColor: ["#4FD2DD", "#235FA7"],
+    message: "",
+    visitorCount: {}, // 全局客流数据
+    indoorEnvDeviceId: "", // 新增：室内环境设备ID
+    ioStateDeviceId: "", // 新增：IO状态设备ID
+    tenantId: "", // 新增：边缘设备ID
+    tenantData: {}, // 新增：租户数据
   },
-  getters: {},
-  mutations: {},
-  actions: {},
+  getters: {
+    visitorCount: (state) => state.visitorCount,
+    indoorEnvDeviceId: (state) => state.indoorEnvDeviceId,
+    ioStateDeviceId: (state) => state.ioStateDeviceId,
+    tenantId: (state) => state.tenantId,
+    tenantData: (state) => state.tenantData,
+    // tenantData 相关的计算属性
+    edgeSerialNumber: (state) => {
+      try {
+        if (state.tenantData.edgeSettings && state.tenantData.edgeSettings[0]) {
+          const edgeSettings = JSON.parse(state.tenantData.edgeSettings[0][1]);
+          return edgeSettings.edgeId
+            .split("-")
+            .map((segment) => segment.charAt(0).toUpperCase())
+            .join("-");
+        }
+        return "";
+      } catch (error) {
+        console.error("Error parsing edgeSerialNumber:", error);
+        return "";
+      }
+    },
+    edgeName: (state) => {
+      try {
+        if (state.tenantData.edgeSettings && state.tenantData.edgeSettings[0]) {
+          const edgeSettings = JSON.parse(state.tenantData.edgeSettings[0][1]);
+          return edgeSettings.name;
+        }
+        return "";
+      } catch (error) {
+        console.error("Error parsing edgeName:", error);
+        return "";
+      }
+    },
+    lastConnectTime: (state) => {
+      try {
+        if (
+          state.tenantData.lastConnectTime &&
+          state.tenantData.lastConnectTime[0]
+        ) {
+          const timeValue = state.tenantData.lastConnectTime[0][1];
+
+          // 如果是时间戳（数字），直接使用
+          if (typeof timeValue === "number") {
+            return new Date(timeValue).toLocaleString();
+          }
+
+          // 如果是字符串，尝试转换成数字（时间戳）
+          if (typeof timeValue === "string") {
+            const numericValue = Number(timeValue);
+            if (!isNaN(numericValue)) {
+              return new Date(numericValue).toLocaleString();
+            }
+            // 如果转换数字失败，尝试直接解析字符串
+            const date = new Date(timeValue);
+            if (!isNaN(date.getTime())) {
+              return date.toLocaleString();
+            }
+            // 如果都失败，返回原始字符串
+            return timeValue;
+          }
+
+          // 其他情况直接返回字符串形式
+          return String(timeValue);
+        }
+        return "";
+      } catch (error) {
+        console.error("Error parsing lastConnectTime:", error);
+        return "";
+      }
+    },
+  },
+  mutations: {
+    SET_MESSAGE(state, message) {
+      state.message = message;
+    },
+    SET_VISITOR_COUNT(state, visitorCount) {
+      state.visitorCount = visitorCount;
+    },
+    SET_INDOOR_ENV_DEVICE_ID(state, id) {
+      state.indoorEnvDeviceId = id;
+    },
+    SET_IO_STATE_DEVICE_ID(state, id) {
+      state.ioStateDeviceId = id;
+    },
+    SET_TENANT_ID(state, id) {
+      state.tenantId = id;
+    },
+    SET_TENANT_DATA(state, data) {
+      // data 是一个对象，包含了最新的租户数据
+      state.tenantData = data;
+    },
+  },
+  actions: {
+    /**
+     * 处理 ws 推送的 visitor_count 数据
+     * @param {Object} context - vuex context
+     * @param {Object} wsData - ws 消息体
+     */
+    handleWsVisitorCount({ commit }, wsData) {
+      // wsData.data.visitor_count 是 [[ts, value]]
+      const arr = wsData?.data?.visitor_count;
+      if (Array.isArray(arr) && arr.length > 0 && arr[0].length > 1) {
+        // 取最新一条
+        const raw = arr[0][1];
+        const visitorCount = parseVisitorCount(raw);
+        commit("SET_VISITOR_COUNT", visitorCount);
+      }
+    },
+    handleWsTenantData({ commit }, wsData) {
+      const data = wsData?.data;
+      commit("SET_TENANT_DATA", data);
+    },
+  },
   modules: {},
 });

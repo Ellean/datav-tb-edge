@@ -4,24 +4,83 @@
       <dvBorderBox5 :color="reversedColor">
         <div class="text">设备编号</div>
         <div class="en">SN</div>
-        <div class="value">{{ serialNumber }}</div></dvBorderBox5
+        <div class="value">
+          {{ edgeSerialNumber }}
+        </div></dvBorderBox5
       >
     </div>
     <div class="title">
-      <div class="text">{{ siteName }}</div>
+      <div class="text">
+        {{ edgeName }}
+      </div>
+      <div class="message">{{ messageContent }}</div>
     </div>
     <div class="active-date">
       <dvBorderBox5 :color="reversedColor" reverse>
-        <div class="text">激活日期</div>
-        <div class="en">AT</div>
-        <div class="value">{{ activationDate }}</div>
+        <div class="text">在线时间</div>
+        <div class="en">LT</div>
+        <div class="value">
+          {{ lastConnectTime }}
+        </div>
       </dvBorderBox5>
     </div>
+    <dvDecoration3
+      :color="reversedColor"
+      style="
+        position: absolute;
+        width: 20vw;
+        height: 50%;
+        left: 24px;
+        top: 10vh;
+      "
+    ></dvDecoration3
+    ><dvDecoration3
+      :color="reversedColor"
+      style="
+        position: absolute;
+        width: 20vw;
+        height: 50%;
+        left: 24px;
+        top: 13vh;
+      "
+    ></dvDecoration3>
+    <dvDecoration5
+      style="
+        position: absolute;
+        width: 60vw;
+        height: 100%;
+        left: 20vw;
+        top: 7vh;
+        z-index: -1;
+      "
+      :dur="10"
+      :color="reversedColor"
+    ></dvDecoration5>
+    <dvDecoration3
+      :color="reversedColor"
+      style="
+        position: absolute;
+        width: 20vw;
+        height: 50%;
+        right: 24px;
+        top: 10vh;
+      "
+    ></dvDecoration3
+    ><dvDecoration3
+      :color="reversedColor"
+      style="
+        position: absolute;
+        width: 20vw;
+        height: 50%;
+        right: 24px;
+        top: 13vh;
+      "
+    ></dvDecoration3>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "HeaderBlock",
@@ -30,12 +89,26 @@ export default {
       serialNumber: "CYZH-001",
       activationDate: "2025-05-01",
       siteName: "乘云智慧驿站-展厅 Smart Station - Exhibition Hall",
+      messageContent: "",
     };
   },
-  computed: mapState({
-    color: "color",
-    reversedColor: "reversedColor",
-  }),
+  watch: {
+    message(nV) {
+      this.messageContent = nV;
+      setTimeout(() => {
+        this.messageContent = "";
+      }, 60000);
+    },
+  },
+  computed: {
+    ...mapState({
+      color: "color",
+      reversedColor: "reversedColor",
+      message: "message",
+      tenantData: "tenantData",
+    }),
+    ...mapGetters(["edgeSerialNumber", "edgeName", "lastConnectTime"]),
+  },
 };
 </script>
 
@@ -96,6 +169,13 @@ export default {
       background: linear-gradient(to right, #4fd2dd, #4fd2dd);
       background-clip: text;
       -webkit-text-fill-color: transparent;
+    }
+
+    .message {
+      width: 100%;
+      text-align: center;
+      color: red;
+      opacity: 1;
     }
   }
 }

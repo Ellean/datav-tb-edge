@@ -10,14 +10,29 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import {
+  getCurrentDateParts,
+  countDay,
+  countMonth,
+  countTotal,
+} from "@/utils/visitorStats";
+
 export default {
   name: "VisitorStatistics",
-  data() {
-    return {
-      daily: 10,
-      monthly: 800,
-      sum: 8933,
-    };
+  computed: {
+    ...mapGetters(["visitorCount"]),
+    daily() {
+      const { year, month, date } = getCurrentDateParts();
+      return countDay(this.visitorCount, year, month, date);
+    },
+    monthly() {
+      const { year, month } = getCurrentDateParts();
+      return countMonth(this.visitorCount, year, month);
+    },
+    sum() {
+      return countTotal(this.visitorCount);
+    },
   },
 };
 </script>

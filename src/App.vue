@@ -1,5 +1,5 @@
 <template>
-  <dvFullScreenContainer>
+  <div class="main-container">
     <!-- 全屏加载动画遮罩 -->
     <div v-if="loading" class="fullscreen-loading">
       <div class="loader"></div>
@@ -12,7 +12,7 @@
     ></LoginBox>
     <HeaderBar v-if="access_token"></HeaderBar>
     <MainBlock v-if="access_token"></MainBlock>
-  </dvFullScreenContainer>
+  </div>
 </template>
 
 <script>
@@ -42,12 +42,14 @@ export default {
     const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
     const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
     const tenantId = this.$store.getters.tenantId;
-    if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
+    const gatewayId = this.$store.getters.gatewayId;
+    if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId || !gatewayId) {
       this.disabled = true;
+      this.loading = false;
       this.$message &&
         this.$message.error &&
         this.$message.error(
-          "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId"
+          "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId和gatewayId"
         );
       return;
     }
@@ -89,7 +91,8 @@ export default {
       const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
       const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
       const tenantId = this.$store.getters.tenantId;
-      if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
+      const gatewayId = this.$store.getters.gatewayId;
+      if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId || !gatewayId) {
         this.$message &&
           this.$message.error &&
           this.$message.error(
@@ -134,6 +137,13 @@ export default {
             scope: "SERVER_SCOPE",
             cmdId: 4,
           },
+          {
+            type: "ATTRIBUTES",
+            entityType: "DEVICE",
+            entityId: gatewayId,
+            scope: "SERVER_SCOPE",
+            cmdId: 5,
+          },
         ],
       });
       this.tbWsListener = {
@@ -149,6 +159,9 @@ export default {
           }
           if (msg && msg.subscriptionId === 4 && msg.data) {
             this.$store.dispatch("handleWsTenantData", msg);
+          }
+          if (msg && msg.subscriptionId === 5 && msg.data) {
+            this.$store.dispatch("handleWsGatewayData", msg);
           }
         },
       };
@@ -173,8 +186,12 @@ body {
   font-family: "Source Han Sans CN", sans-serif;
 }
 
-#dv-full-screen-container {
-  background: center / 100% 100% url("@/assets/images/background.jpg") no-repeat;
+.main-container {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: url("@/assets/images/bg_2.svg") bottom / 100% 60% no-repeat,
+    url("@/assets/images/bg_1.svg") top / 200% 100% no-repeat, #193281;
   &::after {
     content: ""; /* 必须设置内容 */
     position: absolute; /* 绝对定位 */
@@ -187,15 +204,8 @@ body {
   }
 }
 
-.dv-border-box-11 {
-  box-sizing: border-box;
-  padding: calc(5vh + 12px) 24px 24px 24px;
-}
-
 [class$="-en"] {
-  font-size: 0.9rem;
-  font-weight: 100;
-  opacity: 0.5;
+  font-size: 0.8rem;
 }
 
 [class$="-zh"] {

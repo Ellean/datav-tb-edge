@@ -1,62 +1,26 @@
 <template>
   <div class="main">
-    <div class="left">
-      <div class="env">
-        <dvBorderBox11
-          :color="reversedColor"
-          title="节能减排"
-          :titleWidth="150"
-        >
-          <CarbonFootprint></CarbonFootprint>
-        </dvBorderBox11>
-      </div>
-      <div class="carbon">
-        <dvBorderBox11
-          :color="reversedColor"
-          title="环境监测"
-          :titleWidth="150"
-        >
-          <IndoorEnv></IndoorEnv>
-        </dvBorderBox11>
-      </div>
+    <StateMap></StateMap>
+    <WeatherInfo :currentDate="currentDate"></WeatherInfo>
+    <div class="flex">
+      <VisitorReview></VisitorReview>
+      <BillBoard style="width: 47vw"></BillBoard>
+      <CarbonFootprint></CarbonFootprint>
+      <IndoorEnv></IndoorEnv>
+      <VisitorStatistics></VisitorStatistics>
+      <AdditionalInfo></AdditionalInfo>
     </div>
-    <div class="center">
-      <div class="state-map">
-        <dvBorderBox8>
-          <StateMap :height="stateMapHeight" :width="stateMapWidth"></StateMap>
-        </dvBorderBox8>
-      </div>
-      <div class="info">
-        <dvBorderBox11 :color="reversedColor" :title="currentDate">
-          <WeatherInfo></WeatherInfo>
-        </dvBorderBox11>
-      </div>
-      <div class="visitor">
-        <div class="review">
-          <dvBorderBox11
-            :color="reversedColor"
-            title="客流统计"
-            :titleWidth="150"
-          >
-            <VisitorStatistics></VisitorStatistics>
-          </dvBorderBox11>
-        </div>
-        <div class="statistics">
-          <dvBorderBox11
-            :color="reversedColor"
-            title="满意度统计"
-            :titleWidth="170"
-          >
-            <VisitorReview></VisitorReview>
-          </dvBorderBox11>
-        </div>
-      </div>
-    </div>
-    <div class="right">
-      <div class="ads">
-        <dvBorderBox3> </dvBorderBox3>
-      </div>
-    </div>
+    <div
+      style="
+        padding: 12px 24px;
+        box-shadow: 0px -4px 15px 15px #2b5dad inset;
+        position: relative;
+        left: -24px;
+        bottom: -12px;
+        height: 3vh;
+        width: 100vw;
+      "
+    ></div>
   </div>
 </template>
 
@@ -67,7 +31,8 @@ import CarbonFootprint from "./CarbonFootprint.vue";
 import VisitorReview from "./VisitorReview.vue";
 import VisitorStatistics from "./VisitorStatistics.vue";
 import StateMap from "./StateMap.vue";
-import { mapState } from "vuex";
+import BillBoard from "./BillBoard.vue";
+import AdditionalInfo from "./AdditionalInfo.vue";
 
 export default {
   name: "MainBlock",
@@ -78,110 +43,40 @@ export default {
     VisitorReview,
     VisitorStatistics,
     StateMap,
+    BillBoard,
+    AdditionalInfo,
   },
   data() {
     return {
-      currentDate: "",
-      stateMapWidth: 0,
-      stateMapHeight: 0,
+      currentDate: {},
     };
   },
-  computed: mapState({
-    color: "color",
-    reversedColor: "reversedColor",
-  }),
   mounted() {
     setInterval(() => {
       const now = new Date();
-      this.currentDate = new Intl.DateTimeFormat("zh-CN", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }).format(now);
+      this.currentDate = {
+        date: new Intl.DateTimeFormat("zh-CN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(now),
+        time: new Intl.DateTimeFormat("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        }).format(now),
+      };
     }, 1000);
-
-    this.$nextTick(() => {
-      const stateMapEl = this.$el.querySelector(".state-map");
-      if (stateMapEl) {
-        const { width, height } = stateMapEl.getBoundingClientRect();
-        this.stateMapHeight = height;
-        this.stateMapWidth = width;
-      }
-    });
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.main {
-  height: 90vh;
-  width: 100%;
+.flex {
   display: flex;
-  gap: 24px;
-  padding: 24px;
-  box-sizing: border-box;
-  position: absolute;
-  bottom: 0;
-
-  .left,
-  .right,
-  .center {
-    width: 20%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 24px;
-
-    .env,
-    .carbon,
-    .ads {
-      height: fit-content;
-      width: 100%;
-    }
-    .ads {
-      height: 35vh;
-      background: center / 120px url("@/assets/icons/ads-bg.png") no-repeat;
-    }
-  }
-
-  .center {
-    flex: 1;
-    gap: 24px;
-
-    .visitor {
-      height: 17vh;
-      display: flex;
-      gap: 24px;
-
-      .review,
-      .statistics {
-        height: 100%;
-        flex: 1;
-      }
-    }
-
-    .state-map,
-    .info {
-      width: 100%;
-      height: 40vh;
-      position: relative;
-    }
-
-    .state-map {
-      width: 76vw;
-    }
-
-    .info {
-      height: 16vh;
-    }
-  }
-
-  .right {
-    width: 40%;
-  }
+  justify-content: space-between;
+  padding: 1vh 2vw 0 2vw;
+  flex-wrap: wrap;
+  gap: 1vh 2vw;
 }
 </style>

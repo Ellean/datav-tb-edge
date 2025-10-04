@@ -26,6 +26,7 @@ const ioStateDeviceId =
 const tenantId = process.env.VUE_APP_TENANT_ID || getQueryParam("tenantId");
 const username = process.env.VUE_APP_USERNAME || getQueryParam("username");
 const password = process.env.VUE_APP_PASSWORD || getQueryParam("password");
+const gatewayId = process.env.VUE_APP_GATEWAY_ID || getQueryParam("gatewayId");
 if (tenantId) {
   store.commit("SET_TENANT_ID", tenantId);
 }
@@ -37,6 +38,9 @@ if (ioStateDeviceId) {
 }
 if (username && password) {
   store.commit("SET_TENANT_CREDENTIALS", { username, password });
+}
+if (gatewayId) {
+  store.commit("SET_GATEWAY_ID", gatewayId);
 }
 
 new Vue({

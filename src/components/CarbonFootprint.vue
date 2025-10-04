@@ -1,26 +1,40 @@
 <template>
-  <div class="grid">
-    <div class="water"></div>
-    <div class="water-zh">本日节水量</div>
-    <div class="water-en">Water Saved (Today)</div>
-    <div class="water-value">{{ waterDisplay }}</div>
-    <div class="water-monthly"></div>
-    <div class="water-monthly-zh">本月节水量</div>
-    <div class="water-monthly-en">Water Saved (Month)</div>
-    <div class="water-monthly-value">{{ waterMonthlyDisplay }}</div>
-    <div class="carbon"></div>
-    <div class="carbon-zh">本日减碳量</div>
-    <div class="carbon-en">Ammonia</div>
-    <div class="carbon-value">{{ carbonDisplay }}</div>
-    <div class="carbon-monthly"></div>
-    <div class="carbon-monthly-zh">本月减碳量</div>
-    <div class="carbon-monthly-en">Hydrogen sulfide</div>
-    <div class="carbon-monthly-value">{{ carbonMonthlyDisplay }}</div>
+  <div class="container">
+    <SectionTitle
+      titleZh="低碳节能"
+      titleEn="Low Carbon & Energy Saving"
+    ></SectionTitle>
+    <GlowBorder>
+      <div class="grid">
+        <div class="water">
+          <div class="water-zh">今日节水量</div>
+          <div class="water-en">Water Saved (Today)</div>
+        </div>
+        <div class="water-monthly">
+          <div class="water-monthly-zh">本月节水量</div>
+          <div class="water-monthly-en">Water Saved (Month)</div>
+        </div>
+        <div class="carbon">
+          <div class="carbon-zh">今日减碳量</div>
+          <div class="carbon-en">Ammonia</div>
+        </div>
+        <div class="carbon-monthly">
+          <div class="carbon-monthly-zh">本月减碳量</div>
+          <div class="carbon-monthly-en">Hydrogen sulfide</div>
+        </div>
+        <div class="water-value">{{ waterDisplay }}</div>
+        <div class="water-monthly-value">{{ waterMonthlyDisplay }}</div>
+        <div class="carbon-value">{{ carbonDisplay }}</div>
+        <div class="carbon-monthly-value">{{ carbonMonthlyDisplay }}</div>
+      </div>
+    </GlowBorder>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from "vuex";
+import SectionTitle from "./SectionTitle.vue";
+import GlowBorder from "./GlowBorder.vue";
+import { mapGetters } from "vuex";
 import {
   getCurrentDateParts,
   countTypeDay,
@@ -29,6 +43,10 @@ import {
 
 export default {
   name: "CarbonFootprint",
+  components: {
+    SectionTitle,
+    GlowBorder,
+  },
   data() {
     return {
       // 原始数据，water单位g，carbon单位L
@@ -39,10 +57,6 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      color: "color",
-      reversedColor: "reversedColor",
-    }),
     ...mapGetters(["visitorCount"]),
     todayToilet() {
       const { year, month, date } = getCurrentDateParts();
@@ -133,87 +147,155 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.container {
+  width: 45vw;
+}
+
 .grid {
-  width: 100%;
-  height: 100%;
+  padding: 0 2vw;
   display: grid;
-  grid-template-columns: 50px 1.5fr 1fr;
-  grid-template-rows: 30px 30px 30px 30px 30px 30px 30px 30px;
-  gap: 12px 12px;
+  grid-template-columns: 1.5fr 0.5fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 8px 0px;
+  grid-auto-flow: row;
   grid-template-areas:
-    "water water-zh water-value"
-    "water water-en water-value"
-    "water-monthly water-monthly-zh water-monthly-value"
-    "water-monthly water-monthly-en water-monthly-value"
-    "carbon carbon-zh carbon-value"
-    "carbon carbon-en carbon-value"
-    "carbon-monthly carbon-monthly-zh carbon-monthly-value"
-    "carbon-monthly carbon-monthly-en carbon-monthly-value";
-  line-height: 30px;
+    "water water-value"
+    "water-monthly water-monthly-value"
+    "carbon carbon-value"
+    "carbon-monthly carbon-monthly-value";
+
+  align-items: center;
+
+  .water,
+  .carbon,
+  .water-monthly,
+  .carbon-monthly {
+    padding-left: 12px;
+    align-items: center;
+    position: relative;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border-radius: 50%;
+      position: absolute;
+      left: -24px;
+      background-color: #3774d0;
+    }
+  }
 
   .water {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
     grid-area: water;
-    background: center / 40px url("@/assets/icons/water.png") no-repeat;
+
+    .water-en {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+
+    .water-zh {
+      grid-area: 1 / 1 / 2 / 2;
+    }
   }
+
   .water-monthly {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
     grid-area: water-monthly;
-    background: center / 40px url("@/assets/icons/water.png") no-repeat;
+
+    .water-monthly-zh {
+      grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .water-monthly-en {
+      grid-area: 2 / 1 / 3 / 2;
+    }
+
+    &::before {
+      background-color: #5fc1f1;
+    }
   }
-  .carbon,
-  .carbon-monthly {
+
+  .carbon {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "carbon-zh"
+      "carbon-en";
     grid-area: carbon;
-    color: #4fd2dd;
-    font-size: 1.3rem;
-    font-weight: 900;
-    text-align: center;
-    line-height: 62px;
-    background: center / 40px url("@/assets/icons/carbon.png") no-repeat;
+
+    .carbon-zh {
+      grid-area: carbon-zh;
+    }
+
+    .carbon-en {
+      grid-area: carbon-en;
+    }
+
+    &::before {
+      background-color: #71eee6;
+    }
   }
-  [class$="-value"] {
-    font-size: 1.2rem;
-    font-weight: 900;
-    color: #4fd2dd;
-    line-height: 62px;
-    text-align: end;
-  }
+
   .carbon-monthly {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "carbon-monthly-zh"
+      "carbon-monthly-en";
     grid-area: carbon-monthly;
+
+    .carbon-monthly-zh {
+      grid-area: carbon-monthly-zh;
+    }
+
+    .carbon-monthly-en {
+      grid-area: carbon-monthly-en;
+    }
+
+    &::before {
+      background-color: #d99f3b;
+    }
   }
-  .water-monthly-value {
-    grid-area: water-monthly-value;
-  }
-  .carbon-value {
-    grid-area: carbon-value;
-  }
-  .carbon-monthly-value {
-    grid-area: carbon-monthly-value;
-  }
+
   .water-value {
     grid-area: water-value;
   }
-  .water-zh {
-    grid-area: water-zh;
+
+  .water-monthly-value {
+    grid-area: water-monthly-value;
   }
-  .water-en {
-    grid-area: water-en;
+
+  .carbon-value {
+    grid-area: carbon-value;
   }
-  .water-monthly-zh {
-    grid-area: water-monthly-zh;
+
+  .carbon-monthly-value {
+    grid-area: carbon-monthly-value;
   }
-  .water-monthly-en {
-    grid-area: water-monthly-en;
-  }
-  .carbon-zh {
-    grid-area: carbon-zh;
-  }
-  .carbon-en {
-    grid-area: carbon-en;
-  }
-  .carbon-monthly-zh {
-    grid-area: carbon-monthly-zh;
-  }
-  .carbon-monthly-en {
-    grid-area: carbon-monthly-en;
+
+  [class$="-value"] {
+    font-size: 1.2rem;
+    color: #4fd2dd;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 }
 </style>

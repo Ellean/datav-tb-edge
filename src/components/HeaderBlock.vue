@@ -1,81 +1,18 @@
 <template>
-  <div class="header">
-    <div class="SN">
-      <dvBorderBox5 :color="reversedColor">
-        <div class="text">设备编号</div>
-        <div class="en">SN</div>
-        <div class="value">
-          {{ edgeSerialNumber }}
-        </div></dvBorderBox5
-      >
-    </div>
-    <div class="title">
-      <div class="text">
-        {{ edgeName }}
-      </div>
+  <div class="header-bar">
+    <div class="header">
+      <div class="zh">乘云智慧驿站引导系统</div>
+      <div class="en">Cheng Yun Smart Station Guidance System</div>
       <div class="message">{{ messageContent }}</div>
     </div>
-    <div class="active-date">
-      <dvBorderBox5 :color="reversedColor" reverse>
-        <div class="text">在线时间</div>
-        <div class="en">LT</div>
-        <div class="value">
-          {{ lastConnectTime }}
-        </div>
-      </dvBorderBox5>
+    <div class="sub-header">
+      <div class="icon"></div>
+      <div class="site-info">
+        <div class="zh">{{ siteName }}</div>
+        <div class="en">{{ siteNameEn }}</div>
+      </div>
+      <div class="legend"></div>
     </div>
-    <dvDecoration3
-      :color="reversedColor"
-      style="
-        position: absolute;
-        width: 20vw;
-        height: 50%;
-        left: 24px;
-        top: 10vh;
-      "
-    ></dvDecoration3
-    ><dvDecoration3
-      :color="reversedColor"
-      style="
-        position: absolute;
-        width: 20vw;
-        height: 50%;
-        left: 24px;
-        top: 13vh;
-      "
-    ></dvDecoration3>
-    <dvDecoration5
-      style="
-        position: absolute;
-        width: 60vw;
-        height: 100%;
-        left: 20vw;
-        top: 7vh;
-        z-index: -1;
-      "
-      :dur="10"
-      :color="reversedColor"
-    ></dvDecoration5>
-    <dvDecoration3
-      :color="reversedColor"
-      style="
-        position: absolute;
-        width: 20vw;
-        height: 50%;
-        right: 24px;
-        top: 10vh;
-      "
-    ></dvDecoration3
-    ><dvDecoration3
-      :color="reversedColor"
-      style="
-        position: absolute;
-        width: 20vw;
-        height: 50%;
-        right: 24px;
-        top: 13vh;
-      "
-    ></dvDecoration3>
   </div>
 </template>
 
@@ -86,9 +23,6 @@ export default {
   name: "HeaderBlock",
   data() {
     return {
-      serialNumber: "CYZH-001",
-      activationDate: "2025-05-01",
-      siteName: "乘云智慧驿站-展厅 Smart Station - Exhibition Hall",
       messageContent: "",
     };
   },
@@ -102,81 +36,106 @@ export default {
   },
   computed: {
     ...mapState({
-      color: "color",
-      reversedColor: "reversedColor",
       message: "message",
-      tenantData: "tenantData",
     }),
-    ...mapGetters(["edgeSerialNumber", "edgeName", "lastConnectTime"]),
+    ...mapGetters(["siteName", "siteNameEn"]),
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.zh {
+  display: inline-block;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.7rem;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(0, 0, 0, 0.25),
+    0 -1px 0 rgba(191, 231, 255, 0.35), 0 3px 8px rgba(3, 37, 63, 0.45);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 40%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 40%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  /* 兼容性优化 */
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.en {
+  margin-top: 0.5vh;
+  font-size: 0.7rem;
+  font-weight: 100;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
 .header {
-  height: 8vh;
+  padding: 12px 12px 24px 12px;
+  box-shadow: 0px -4px 15px 4px #2b5dad inset;
+  position: relative;
+  left: -12px;
+
+  height: 3vh;
   width: 100vw;
   display: flex;
-  justify-content: space-between;
-  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  background-image: url("@/assets/images/bg_header.svg");
+  background-position: 0px -12px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
 
-  .SN,
-  .active-date {
-    color: #235fa7ff;
-    width: 15vw;
-    height: 100%;
-    font-size: 1rem;
+.sub-header {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  padding: 12px 48px 12px 12px;
+  box-sizing: border-box;
+  gap: 12px;
 
-    .text {
-      width: fit-content;
-      transform: translate(9.5vw, 2vh) rotate(-45deg);
-      transform-origin: right top;
+  .icon {
+    width: 80px;
+    aspect-ratio: 1 / 1;
+    background: url("@/assets/icons/site.svg") center / contain no-repeat;
+  }
+
+  .site-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    .zh {
+      font-size: 2rem;
+      font-weight: normal;
     }
 
     .en {
-      width: fit-content;
-      transform: translate(1vw, 1vh) rotate(-45deg);
-    }
-
-    .value {
-      width: 100%;
-      line-height: 8vh;
-      text-align: center;
-      position: absolute;
-      top: 0;
+      margin: 8px 0 0 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
     }
   }
 
-  .active-date {
-    .text {
-      transform: translate(0vw, 1vh) rotate(-45deg);
-    }
-
-    .en {
-      transform: translate(13vw, 1vh) rotate(-45deg);
-    }
-  }
-
-  .title {
-    flex: 1;
-    height: 100%;
-    padding: 0 4vw;
-
-    .text {
-      font-size: 2.5rem;
-      line-height: 8vh;
-      text-align: center;
-      background: linear-gradient(to right, #4fd2dd, #4fd2dd);
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .message {
-      width: 100%;
-      text-align: center;
-      color: red;
-      opacity: 1;
-    }
+  .legend {
+    margin-left: auto;
+    width: 154px;
+    height: 48px;
+    background: url("@/assets/images/legend_vacant.svg") left / contain
+        no-repeat,
+      url("@/assets/images/legend_occupied.svg") right / contain no-repeat;
   }
 }
 </style>

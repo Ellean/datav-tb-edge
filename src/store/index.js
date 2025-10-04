@@ -7,8 +7,6 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    color: ["#235FA7", "#4FD2DD"],
-    reversedColor: ["#4FD2DD", "#235FA7"],
     message: "",
     visitorCount: {}, // 全局客流数据
     indoorEnvDeviceId: "", // 新增：室内环境设备ID
@@ -17,6 +15,10 @@ export default new Vuex.Store({
     tenantData: {}, // 新增：租户数据
     tenantUsername: "", // 新增：租户用户名
     tenantPassword: "", // 新增：租户密码
+    gatewayId: "", // 新增：网关ID
+    gatewayData: {
+      location: "101210505", // 默认嵊州
+    }, // 新增：网关数据
   },
   getters: {
     visitorCount: (state) => state.visitorCount,
@@ -24,6 +26,7 @@ export default new Vuex.Store({
     ioStateDeviceId: (state) => state.ioStateDeviceId,
     tenantId: (state) => state.tenantId,
     tenantData: (state) => state.tenantData,
+    gatewayId: (state) => state.gatewayId,
     // tenantData 相关的计算属性
     edgeSerialNumber: (state) => {
       try {
@@ -91,6 +94,18 @@ export default new Vuex.Store({
     },
     tenantUsername: (state) => state.tenantUsername,
     tenantPassword: (state) => state.tenantPassword,
+    siteName: (state) => {
+      return state.gatewayData.siteName || "";
+    },
+    siteNameEn: (state) => {
+      return state.gatewayData.siteNameEn || "";
+    },
+    staffList: (state) => {
+      return (
+        JSON.parse(state.gatewayData.additionalInfo || "{}").staffList || []
+      );
+    },
+    location: (state) => state.gatewayData.location, // 默认嵊州
   },
   mutations: {
     SET_MESSAGE(state, message) {
@@ -116,6 +131,15 @@ export default new Vuex.Store({
       state.tenantUsername = username;
       state.tenantPassword = password;
     },
+    SET_GATEWAY_ID(state, id) {
+      state.gatewayId = id;
+    },
+    SET_GATEWAY_DATA(state, data) {
+      state.gatewayData = {
+        ...state.gatewayData,
+        ...data,
+      };
+    },
   },
   actions: {
     /**
@@ -136,6 +160,30 @@ export default new Vuex.Store({
     handleWsTenantData({ commit }, wsData) {
       const data = wsData?.data;
       commit("SET_TENANT_DATA", data);
+    },
+    handleWsGatewayData({ commit }, wsData) {
+      // 只保留最新一条数据（latestValues 里的时间戳对应的 value）
+      const data = wsData?.data;
+      if (data && wsData.latestValues) {
+        const result = {};
+        for (const key in wsData.latestValues) {
+          const ts = wsData.latestValues[key];
+          if (Array.isArray(data[key])) {
+            // 找到时间戳匹配的那一项
+            const found = data[key].find((item) => item[0] === ts);
+            if (found) {
+              result[key] = found[1];
+            } else {
+              result[key] = "";
+            }
+          } else {
+            result[key] = "";
+          }
+        }
+        commit("SET_GATEWAY_DATA", result);
+      } else {
+        commit("SET_GATEWAY_DATA", data);
+      }
     },
   },
   modules: {},

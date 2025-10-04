@@ -1,42 +1,55 @@
 <template>
-  <div class="grid">
-    <div class="temp"></div>
-    <div class="temp-zh">温度</div>
-    <div class="temp-en">Temperature</div>
-    <div class="temp-value">{{ temp || "-" }} ℃</div>
-    <div class="humid"></div>
-    <div class="humid-zh">湿度</div>
-    <div class="humid-en">Humidity</div>
-    <div class="humid-value">{{ humid || "-" }} %</div>
-    <div class="NH3">NH₃</div>
-    <div class="NH3-zh">氨气</div>
-    <div class="NH3-en">Ammonia</div>
-    <div class="NH3-value">{{ NH3 || "-" }} ppm</div>
-    <div class="H2S">H₂S</div>
-    <div class="H2S-zh">硫化氢</div>
-    <div class="H2S-en">Hydrogen sulfide</div>
-    <div class="H2S-value">{{ H2S || "-" }} ppm</div>
+  <div class="container">
+    <SectionTitle
+      titleZh="环境监测"
+      titleEn="Indoor Environment"
+    ></SectionTitle>
+    <GlowBorder>
+      <div class="grid">
+        <div class="temp">
+          <div class="temp-zh">温度</div>
+          <div class="temp-en">Temperature</div>
+        </div>
+        <div class="humid">
+          <div class="humid-zh">湿度</div>
+          <div class="humid-en">Humidity</div>
+        </div>
+        <div class="NH3">
+          <div class="NH3-zh">氨气</div>
+          <div class="NH3-en">Ammonia</div>
+        </div>
+        <div class="PM-2-5">
+          <div class="PM-2-5-zh">PM2.5</div>
+          <div class="PM-2-5-en">Particulate Matter 2.5</div>
+        </div>
+        <div class="temp-value">{{ temp || "-" }} ℃</div>
+        <div class="humid-value">{{ humid || "-" }} %</div>
+        <div class="NH3-value">{{ NH3 || "-" }} ppm</div>
+        <div class="PM-2-5-value">{{ PM25 || "-" }} ppm</div>
+      </div>
+    </GlowBorder>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import SectionTitle from "./SectionTitle.vue";
+import GlowBorder from "./GlowBorder.vue";
 
 export default {
   name: "IndoorEnv",
+  components: {
+    SectionTitle,
+    GlowBorder,
+  },
   data() {
     return {
       temp: "",
       humid: "",
       NH3: "",
-      H2S: "",
+      PM25: "",
       tbWsListener: null,
     };
   },
-  computed: mapState({
-    color: "color",
-    reversedColor: "reversedColor",
-  }),
   mounted() {
     // 监听ThingsBoard Edge推送
     this.tbWsListener = {
@@ -50,7 +63,7 @@ export default {
             case "humid":
               return (val / 100).toFixed(2);
             case "NH3":
-            case "H2S":
+            case "pm_2.5":
               return (val / 1000).toFixed(3);
             default:
               return val;
@@ -63,8 +76,8 @@ export default {
             this.humid = parseValue(data.data.humid, "humid");
           if (data.data.NH3 !== undefined)
             this.NH3 = parseValue(data.data.NH3, "NH3");
-          if (data.data.H2S !== undefined)
-            this.H2S = parseValue(data.data.H2S, "H2S");
+          if (data.data["pm_2.5"] !== undefined)
+            this.PM25 = parseValue(data.data["pm_2.5"], "pm_2.5");
         }
       },
     };
@@ -79,88 +92,159 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.grid {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 50px 1fr 1fr;
-  grid-template-rows: 30px 30px 30px 30px 30px 30px 30px 30px;
-  gap: 12px 12px;
-  grid-template-areas:
-    "temp temp-zh temp-value"
-    "temp temp-en temp-value"
-    "humid humid-zh humid-value"
-    "humid humid-en humid-value"
-    "NH3 NH3-zh NH3-value"
-    "NH3 NH3-en NH3-value"
-    "H2S H2S-zh H2S-value"
-    "H2S H2S-en H2S-value";
-  line-height: 30px;
+.container {
+  width: 45vw;
+}
 
-  .temp {
-    grid-area: temp;
-    background: center / 40px url("@/assets/icons/temp.png") no-repeat;
-  }
-  .humid {
-    grid-area: humid;
-    background: center / 40px url("@/assets/icons/humid.png") no-repeat;
-  }
-  .NH3,
-  .H2S {
-    grid-area: NH3;
-    color: #615da4;
-    font-size: 0.5rem;
-    font-weight: 900;
-    text-align: center;
-    line-height: 72px;
-    padding: 0.2rem 0 0 0.5rem;
-    background: center / 40px url("@/assets/icons/bubble.png") no-repeat;
-  }
-  [class$="-value"] {
-    font-size: 1.2rem;
-    font-weight: 900;
-    color: #4fd2dd;
-    line-height: 62px;
-    text-align: end;
-  }
-  .H2S {
-    grid-area: H2S;
-  }
-  .humid-value {
-    grid-area: humid-value;
-  }
-  .NH3-value {
-    grid-area: NH3-value;
-  }
-  .H2S-value {
-    grid-area: H2S-value;
-  }
+.grid {
+  padding: 0 2vw;
+  display: grid;
+  grid-template-columns: 1.5fr 0.5fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  gap: 8px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "temp temp-value"
+    "humid humid-value"
+    "PM-2-5 PM-2-5-value"
+    "NH3 NH3-value";
+
   .temp-value {
     grid-area: temp-value;
   }
-  .temp-zh {
-    grid-area: temp-zh;
+
+  .humid-value {
+    grid-area: humid-value;
   }
-  .temp-en {
-    grid-area: temp-en;
+
+  .PM-2-5-value {
+    grid-area: PM-2-5-value;
   }
-  .humid-zh {
-    grid-area: humid-zh;
+
+  .NH3-value {
+    grid-area: NH3-value;
   }
-  .humid-en {
-    grid-area: humid-en;
+
+  .temp,
+  .humid,
+  .PM-2-5,
+  .NH3 {
+    padding-left: 12px;
+    align-items: center;
+    position: relative;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      border-radius: 50%;
+      position: absolute;
+      left: -24px;
+      background-color: #3774d0;
+    }
   }
-  .NH3-zh {
-    grid-area: NH3-zh;
+
+  .temp {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "temp-zh"
+      "temp-en";
+    grid-area: temp;
+
+    .temp-zh {
+      grid-area: temp-zh;
+    }
+
+    .temp-en {
+      grid-area: temp-en;
+    }
   }
-  .NH3-en {
-    grid-area: NH3-en;
+
+  .humid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "humid-zh"
+      "humid-en";
+    grid-area: humid;
+
+    .humid-zh {
+      grid-area: humid-zh;
+    }
+
+    .humid-en {
+      grid-area: humid-en;
+    }
+
+    &::before {
+      background-color: #5fc1f1;
+    }
   }
-  .H2S-zh {
-    grid-area: H2S-zh;
+
+  .PM-2-5 {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "PM-2-5-zh"
+      "PM-2-5-en";
+    grid-area: PM-2-5;
+
+    .PM-2-5-zh {
+      grid-area: PM-2-5-zh;
+    }
+
+    .PM-2-5-en {
+      grid-area: PM-2-5-en;
+    }
+
+    &::before {
+      background-color: #71eee6;
+    }
   }
-  .H2S-en {
-    grid-area: H2S-en;
+
+  .NH3 {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "NH3-zh"
+      "NH3-en";
+    grid-area: NH3;
+
+    .NH3-zh {
+      grid-area: NH3-zh;
+    }
+
+    .NH3-en {
+      grid-area: NH3-en;
+    }
+
+    &::before {
+      background-color: #d99f3b;
+    }
+  }
+
+  [class$="-value"] {
+    font-size: 1.2rem;
+    color: #4fd2dd;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 }
 </style>

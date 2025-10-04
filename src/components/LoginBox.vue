@@ -177,8 +177,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url("@/assets/images/background.jpg") no-repeat center
-    center/cover;
+  background: url("@/assets/images/bg_2.svg") no-repeat center center/cover;
   overflow: hidden;
 
   /* 遮罩层 */

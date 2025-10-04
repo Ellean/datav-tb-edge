@@ -1,11 +1,10 @@
-import Cookies from "js-cookie";
 <template>
   <div
     class="container"
     ref="container"
     :style="{
-      width: width + 'px',
-      height: height + 'px',
+      width,
+      height,
     }"
   >
     <vue-draggable-resizable
@@ -15,6 +14,7 @@ import Cookies from "js-cookie";
       :y="block.y"
       :w="block.w"
       :h="block.h"
+      parent
       @dragging="onDragging(index, ...arguments)"
       @dragstop="onDragstop(index, ...arguments)"
       @resizing="onResizing(index, ...arguments)"
@@ -24,43 +24,77 @@ import Cookies from "js-cookie";
       <div
         class="block"
         :style="{
-          width: '100%',
-          height: '100%',
-          background: `center / 60px url('/icons/${block.type}-${
-            STATE_MAP[getBlockState(block, index)]
-          }.png') no-repeat`,
+          boxShadow: block.type
+            ? `0px 0px 20px 13px  ${
+                STATE_MAP[getBlockState(block, index)] === 'occupied'
+                  ? ['#9B4B5D']
+                  : STATE_MAP[getBlockState(block, index)] === 'available'
+                  ? ['#8dfa6594']
+                  : ['#8C8C8CC7']
+              } inset`
+            : 'none',
+          clipPath: block.clipPath || 'none',
         }"
-        @click="loopState(index, getBlockState(block, index))"
         @contextmenu.prevent="showMenu($event, index)"
         @mousedown="onBlockMouseDown($event, index)"
         @mouseup="onBlockMouseUp($event, index)"
         @mouseleave="onBlockMouseLeave($event, index)"
       >
-        <dvBorderBox7
-          :color="
-            STATE_MAP[getBlockState(block, index)] === 'occupied'
-              ? ['#FFB02BD6']
-              : STATE_MAP[getBlockState(block, index)] === 'available'
-              ? ['#8DFA65']
-              : ['#8C8C8CC7']
-          "
+        <div
+          class="label"
+          :class="{ 'no-icon': !block.type }"
+          :style="{
+            color:
+              STATE_MAP[getBlockState(block, index)] === 'occupied'
+                ? ['#9B4B5D']
+                : STATE_MAP[getBlockState(block, index)] === 'available'
+                ? ['#8dfa6594']
+                : ['#8C8C8CC7'],
+          }"
         >
+          <div class="zh">{{ block.title.zh }}</div>
+          <div class="en">{{ block.title.en }}</div>
           <div
-            class="text"
+            v-if="block.type"
+            class="icon"
             :style="{
-              color:
-                STATE_MAP[getBlockState(block, index)] === 'occupied'
-                  ? ['#FFB02BD6']
-                  : STATE_MAP[getBlockState(block, index)] === 'available'
-                  ? ['#8DFA65']
-                  : ['#8C8C8CC7'],
+              width: '100%',
+              height: '100%',
+              background: `center / contain url('/icons/${block.type}_${
+                STATE_MAP[getBlockState(block, index)]
+              }.svg') no-repeat`,
             }"
-          >
-            {{ STATE_LABEL_MAP[getBlockState(block, index)] }}
-          </div>
-        </dvBorderBox7>
+          ></div>
+        </div>
       </div>
     </vue-draggable-resizable>
+    <div class="state-row">
+      <div
+        class="item"
+        v-for="(block, index) in mapConfig.filter((b) => b.type)"
+        :key="'item' + block.key"
+        :style="{
+          boxShadow: `0px 0px 10px 5px  ${
+            STATE_MAP[getBlockState(block, index)] === 'occupied'
+              ? ['#9B4B5D']
+              : STATE_MAP[getBlockState(block, index)] === 'available'
+              ? ['#8dfa6594']
+              : ['#8C8C8CC7']
+          } inset`,
+          color:
+            STATE_MAP[getBlockState(block, index)] === 'occupied'
+              ? ['#9B4B5D']
+              : STATE_MAP[getBlockState(block, index)] === 'available'
+              ? ['#8dfa6594']
+              : ['#8C8C8CC7'],
+        }"
+      >
+        <div class="label no-icon">
+          <div class="zh">{{ block.title.zh }}</div>
+          <div class="en">{{ block.title.en }}</div>
+        </div>
+      </div>
+    </div>
     <!-- 右键菜单 -->
     <div
       v-if="menu.visible"
@@ -93,18 +127,17 @@ import {
   getCurrentDateParts,
   initVisitorCountStructure,
 } from "@/utils/visitorStats";
-import Cookies from "js-cookie";
 
 export default {
   name: "StateMap",
   props: {
     height: {
-      type: Number,
-      default: 600,
+      type: String,
+      default: "17vh",
     },
     width: {
-      type: Number,
-      default: 400,
+      type: String,
+      default: "100%",
     },
   },
   data() {
@@ -136,54 +169,124 @@ export default {
       },
       mapConfig: [
         {
-          key: "toilet-1",
-          x: 0,
-          y: 200,
-          w: 60,
-          h: 200,
+          key: "toilet-accessible",
+          title: {
+            zh: "无障碍卫生间",
+            en: "Accessible Toilet",
+          },
           type: "toilet",
           stateKey: null,
           lastTS: 0,
+          x: 25,
+          y: 9,
+          w: 270,
+          h: 295,
+          clipPath:
+            "polygon(0 0, 220px 0, 220px 115px, 100% 115px, 100% 100%, 0 100%)",
         },
         {
           key: "urinal-1",
-          x: 0,
-          y: 0,
-          w: 60,
-          h: 200,
+          title: {
+            zh: "小便间",
+            en: "Urinal Area",
+          },
           type: "urinal",
           stateKey: null,
           lastTS: 0,
+          x: 301,
+          y: 125,
+          w: 265,
+          h: 178,
+        },
+        {
+          key: "toilet-1",
+          title: {
+            zh: "厕间 I",
+            en: "Toilet I",
+          },
+          type: "toilet",
+          stateKey: null,
+          lastTS: 0,
+          x: 399,
+          y: 8,
+          w: 166,
+          h: 112,
+        },
+        {
+          key: "toilet-2",
+          title: {
+            zh: "厕间 II",
+            en: "Toilet II",
+          },
+          type: "toilet",
+          stateKey: null,
+          lastTS: 0,
+          x: 890,
+          y: 8,
+          w: 166,
+          h: 133,
         },
         {
           key: "toilet-3",
-          x: 180,
-          y: 0,
-          w: 60,
-          h: 280,
+          title: {
+            zh: "厕间 III",
+            en: "Toilet III",
+          },
           type: "toilet",
           stateKey: null,
           lastTS: 0,
+          x: 891,
+          y: 148,
+          w: 165,
+          h: 169,
         },
         {
-          key: "toile-4",
-          x: 240,
-          y: 0,
-          w: 60,
-          h: 280,
-          type: "toilet",
-          stateKey: null,
+          key: "equipment-room",
+          title: {
+            zh: "设备间",
+            en: "Equipment Room",
+          },
           lastTS: 0,
+          x: 252,
+          y: 9,
+          w: 141,
+          h: 109,
         },
         {
-          key: "sink",
-          x: 144,
-          y: 0,
-          w: 36,
-          h: 280,
-          type: "sink",
-          stateKey: null,
+          key: "ad-screen",
+          title: {
+            zh: "广告屏",
+            en: "Ad Screen",
+          },
           lastTS: 0,
+          x: 650,
+          y: 19,
+          w: 143,
+          h: 41,
+        },
+        {
+          key: "sink-area",
+          title: {
+            zh: "洗手池",
+            en: "Sink Area",
+          },
+          lastTS: 0,
+          x: 745,
+          y: 192,
+          w: 143,
+          h: 41,
+        },
+        {
+          key: "entrance-exit",
+          title: {
+            zh: "出入口",
+            en: "Entrance & Exit",
+          },
+          lastTS: 0,
+          x: 587,
+          y: 244,
+          w: 143,
+          h: 41,
         },
       ],
       menu: {
@@ -195,7 +298,8 @@ export default {
     };
   },
   mounted() {
-    const tb_mapConfig = Cookies.get("tb_mapConfig");
+    document.addEventListener("click", this.hideMenu);
+    const tb_mapConfig = localStorage.getItem("tb_mapConfig");
     this.mapConfig = tb_mapConfig ? JSON.parse(tb_mapConfig) : this.mapConfig;
     // 监听ThingsBoard Edge推送
     this.tbWsListener = {
@@ -246,7 +350,7 @@ export default {
   watch: {
     mapConfig: {
       handler(val) {
-        Cookies.set("tb_mapConfig", JSON.stringify(val), { expires: 365 });
+        localStorage.setItem("tb_mapConfig", JSON.stringify(val));
       },
       deep: true,
     },
@@ -322,16 +426,11 @@ export default {
     },
     hideMenu() {
       this.menu.visible = false;
-      document.removeEventListener("click", this.hideMenu);
     },
     selectStateKey(blockIndex, key) {
       console.log(`选择IO通道: ${key}，对应块索引: ${blockIndex}`);
       this.mapConfig[blockIndex].stateKey = key;
       this.hideMenu();
-    },
-    loopState(index, state) {
-      const _state = Number(state);
-      this.mapConfig[index].state = _state < 0 ? "0" : "-1";
     },
     // 批量上报 visitor_count，所有 type 一次性累加
     async increaseVisitorCountBatch(types) {
@@ -368,19 +467,92 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+::v-deep .vdr {
+  border: none;
+}
+
 .container {
   min-width: 300px;
   min-height: 200px;
   position: relative;
-  user-select: none;
+  margin-top: 2vh;
+  background: url("@/assets/images/bg_map.png") center / cover no-repeat,
+    url("@/assets/images/entrance_arrow.svg") 60% 90% / 50px 100px no-repeat,
+    url("@/assets/images/exit_arrow.svg") 63% 100% / 50px 100px no-repeat,
+    #193281;
+
+  * {
+    user-select: none;
+  }
+
+  .label {
+    width: fit-content;
+    height: 3vh;
+    font-size: 1.3rem;
+    line-height: 1;
+    pointer-events: auto;
+    display: grid;
+    grid-template-columns: 1.5fr 0.5fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      "zh icon"
+      "en icon";
+    align-items: center;
+    justify-items: right;
+    column-gap: 8px;
+
+    &.no-icon {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "zh"
+        "en";
+      align-items: center;
+      justify-items: center;
+    }
+
+    .icon {
+      grid-area: icon;
+    }
+    .zh {
+      grid-area: zh;
+      font-size: 1.2rem;
+      align-self: flex-end;
+    }
+    .en {
+      grid-area: en;
+      font-size: 0.9rem;
+    }
+  }
 }
+
 .block {
   width: 100%;
   height: 100%;
-  .text {
-    font-size: 18px;
-    padding: 12px;
-    pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.state-row {
+  width: 100%;
+  height: auto;
+  position: relative;
+  top: 18vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0;
+
+  .item {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 15px;
+    border-radius: 16px;
+    padding: 20px;
   }
 }
 /* 右键菜单样式美化 */

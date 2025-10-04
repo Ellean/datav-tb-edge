@@ -1,17 +1,17 @@
 <template>
   <div class="box">
-    <div class="city">
-      <div>{{ weatherCity }}</div>
-      <div class="city-en">{{ weatherCityEN }}</div>
+    <div class="date">
+      <div class="time">{{ currentDate.time }}</div>
+      <div class="date">{{ currentDate.date }}</div>
     </div>
-    <div class="condition">
+    <div v-if="location" class="condition">
       <i :class="`qi-${weatherIcon}`"></i>
       <div class="condition-value">
         {{ weatherText }}
         <span class="condition-en">{{ weatherTextEN }}</span>
       </div>
     </div>
-    <div class="temp">
+    <div v-if="location" class="temp">
       <div
         :style="{
           color:
@@ -44,27 +44,42 @@
         {{ weatherTemp }} ℃
       </div>
     </div>
-    <div class="humid">
+    <div v-if="location" class="humid">
       <div>
         <i class="qi-2120"></i>湿度 <span class="condition-en">Humid.</span>
       </div>
       <div class="humid-value">{{ weatherHumid }} %</div>
     </div>
+    <div v-else>
+      <div class="condition-value">未设置城市 / 坐标</div>
+    </div>
   </div>
 </template>
 
 <script>
-import { getWeatherZH, getWeatherEN } from "@/api/qweather";
-import { mapState } from "vuex";
+import {
+  getWeatherZH,
+  getWeatherEN,
+  getCityInfoZH,
+  getCityInfoEN,
+} from "@/api/qweather";
+import { mapGetters } from "vuex";
 
 let weatherTimer = null;
 
 export default {
   name: "WeatherInfo",
+  props: {
+    currentDate: {
+      type: Object,
+      required: true,
+      default: () => ({}),
+    },
+  },
   data() {
     return {
-      weatherCity: "嵊州",
-      weatherCityEN: "ShengZhou",
+      weatherCity: "",
+      weatherCityEN: "",
       weatherIcon: "",
       weatherText: "",
       weatherTextEN: "",
@@ -72,10 +87,16 @@ export default {
       weatherHumid: "",
     };
   },
-  computed: mapState({
-    color: "color",
-    reversedColor: "reversedColor",
-  }),
+  computed: {
+    ...mapGetters(["location"]),
+  },
+  watch: {
+    location(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.loadWeatherData();
+      }
+    },
+  },
   mounted() {
     this.loadWeatherData();
     weatherTimer = setInterval(() => {
@@ -84,15 +105,39 @@ export default {
   },
   methods: {
     loadWeatherData() {
-      getWeatherZH().then(({ data: { now } }) => {
-        this.weatherIcon = now.icon;
-        this.weatherText = now.text;
-        this.weatherTemp = now.temp;
-        this.weatherHumid = now.humidity;
-      });
-      getWeatherEN().then(({ data: { now } }) => {
-        this.weatherTextEN = now.text;
-      });
+      if (this.location) {
+        getWeatherZH(this.location)
+          .then(({ data: { now } }) => {
+            this.weatherIcon = now.icon;
+            this.weatherText = now.text;
+            this.weatherTemp = now.temp;
+            this.weatherHumid = now.humidity;
+          })
+          .catch((err) => {
+            console.error("获取天气信息失败", err);
+          });
+        getWeatherEN(this.location)
+          .then(({ data: { now } }) => {
+            this.weatherTextEN = now.text;
+          })
+          .catch((err) => {
+            console.error("获取天气信息失败", err);
+          });
+        getCityInfoZH(this.location)
+          .then(({ data }) => {
+            this.weatherCity = data.location[0].name;
+          })
+          .catch((err) => {
+            console.error("获取城市信息失败", err);
+          });
+        getCityInfoEN(this.location)
+          .then(({ data }) => {
+            this.weatherCityEN = data.location[0].name;
+          })
+          .catch((err) => {
+            console.error("获取城市信息失败", err);
+          });
+      }
     },
   },
   beforeDestroy() {
@@ -105,25 +150,46 @@ export default {
 .box {
   width: 100%;
   height: 100%;
-  box-sizing: border-box;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  margin-top: 9vh;
+  padding: 12px;
+  box-shadow: 0px 0px 15px 4px #265fbc inset;
+  position: relative;
+  left: -12px;
 
   font-size: 1.2rem;
   font-weight: 900;
 
   .date {
     width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    .time {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .date {
+      font-size: 0.5rem;
+      font-weight: 900;
+      color: #999999;
+      text-align: center;
+    }
   }
 
-  .city,
   .condition,
   .temp,
   .humid {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 16px;
   }
 
   .condition {

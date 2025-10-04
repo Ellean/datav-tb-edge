@@ -7,19 +7,37 @@ const instance = Axios.create({
   },
 });
 
-export const getWeatherZH = () => {
+export const getWeatherZH = (location) => {
   return instance.get("/v7/weather/now", {
     params: {
-      location: "101210505",
+      location,
       lang: "zh-hans",
     },
   });
 };
 
-export const getWeatherEN = () => {
+export const getWeatherEN = (location) => {
   return instance.get("/v7/weather/now", {
     params: {
-      location: "101210505",
+      location,
+      lang: "en",
+    },
+  });
+};
+
+export const getCityInfoZH = (location) => {
+  return instance.get("/v2/city/lookup", {
+    params: {
+      location,
+      lang: "zh-hans",
+    },
+  });
+};
+
+export const getCityInfoEN = (location) => {
+  return instance.get("/v2/city/lookup", {
+    params: {
+      location,
       lang: "en",
     },
   });

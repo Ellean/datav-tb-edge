@@ -38,6 +38,46 @@ export default {
     };
   },
   mounted() {
+    // 输出当前浏览器的缩放比、视窗大小、字体大小（兼容安卓WebView，健壮性处理）
+    function safe(val) {
+      if (val === undefined || val === null || val === "") return "N/A";
+      return String(val);
+    }
+    let zoom = safe(window.devicePixelRatio);
+    let width = safe(window.innerWidth);
+    let height = safe(window.innerHeight);
+    let fontSize = "N/A";
+    try {
+      fontSize = safe(
+        window.getComputedStyle &&
+          window.getComputedStyle(document.documentElement).fontSize
+      );
+    } catch (e) {
+      fontSize = "N/A";
+    }
+    const info = {
+      zoom,
+      width,
+      height,
+      fontSize,
+    };
+    window._mountInfo = info;
+    console.log("[挂载信息] 浏览器缩放比:" + zoom);
+    console.log("[挂载信息] 视窗大小:" + width + "x" + height);
+    console.log("[挂载信息] 根字体大小:" + fontSize);
+    // 安卓WebView下alert兜底
+    if (/Android/.test(navigator.userAgent) && /wv/.test(navigator.userAgent)) {
+      alert(
+        "[挂载信息]\n缩放比: " +
+          zoom +
+          "\n视窗: " +
+          width +
+          "x" +
+          height +
+          "\n字体: " +
+          fontSize
+      );
+    }
     // 校验必要参数
     const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
     const ioStateDeviceId = this.$store.getters.ioStateDeviceId;

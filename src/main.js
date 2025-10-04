@@ -18,9 +18,13 @@ Vue.use(tbWsPlugin);
 Vue.config.productionTip = false;
 
 // 从URL参数获取设备ID并存入Vuex
-const indoorEnvDeviceId = getQueryParam("indoorEnvDeviceId");
-const ioStateDeviceId = getQueryParam("ioStateDeviceId");
-const tenantId = getQueryParam("tenantId");
+const indoorEnvDeviceId =
+  process.env.VUE_APP_INDOOR_ENV_DEVICE_ID ||
+  getQueryParam("indoorEnvDeviceId");
+const ioStateDeviceId =
+  process.env.VUE_APP_IO_STATE_DEVICE_ID || getQueryParam("ioStateDeviceId");
+const tenantId = process.env.VUE_APP_TENANT_ID || getQueryParam("tenantId");
+const gatewayId = process.env.VUE_APP_GATEWAY_ID || getQueryParam("gatewayId");
 if (tenantId) {
   store.commit("SET_TENANT_ID", tenantId);
 }

@@ -24,16 +24,15 @@ instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response && error.response.status === 401) {
-      try {
-        const { token: newToken } = await refreshToken();
-
-        // 重新发送失败的请求
-        error.config.headers.Authorization = `Bearer ${newToken}`;
-        return instance(error.config);
-      } catch (refreshError) {
-        console.error("无法刷新Token:", refreshError);
-        // 处理刷新失败（例如跳转到登录页面）
-      }
+      refreshToken()
+        .then(({ token: newToken }) => {
+          // 重新发送失败的请求
+          error.config.headers.Authorization = `Bearer ${newToken}`;
+          return instance(error.config);
+        })
+        .catch(async (refreshError) => {
+          console.error("无法刷新Token:", refreshError);
+        });
     }
 
     return Promise.reject(new Error(error));

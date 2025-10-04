@@ -1,7 +1,12 @@
 <template>
   <dvFullScreenContainer>
+    <!-- 全屏加载动画遮罩 -->
+    <div v-if="loading" class="fullscreen-loading">
+      <div class="loader"></div>
+    </div>
     <LoginBox
       v-if="!access_token"
+      ref="loginBox"
       :disabled="disabled"
       @login-success="toShowMain"
     ></LoginBox>
@@ -19,12 +24,17 @@ import LoginBox from "./components/LoginBox.vue";
 
 export default {
   name: "App",
-  components: { HeaderBar, MainBlock, LoginBox },
+  components: {
+    HeaderBar,
+    MainBlock,
+    LoginBox,
+  },
   data() {
     return {
       access_token: "",
       disabled: false,
       tbWsListener: null,
+      loading: true, // 控制全屏加载动画显示
     };
   },
   watch: {
@@ -33,21 +43,65 @@ export default {
         const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
         const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
         const tenantId = this.$store.getters.tenantId;
-        if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
+    if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
+      this.disabled = true;
+      this.loading = false;
           this.$message &&
             this.$message.error &&
             this.$message.error(
               "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId"
             );
+      return;
+    }
+    refreshToken()
+      .then((res) => {
+        // 加载完成后关闭 loading
+        this.loading = false;
+        if (res && res.token) {
+          this.initWS(res.token);
+          this.toShowMain({ token: res.token });
+        } else {
+          console.error("刷新 token 失败，重新登录");
           this.access_token = "";
           this.$Cookie.remove("tb_access_token");
           this.$Cookie.remove("tb_refresh_token");
-          return;
+        }
+      })
+      .catch((err) => {
+        console.error("刷新 token 失败，重新登录", err);
+        this.access_token = "";
+        this.$Cookie.remove("tb_access_token");
+        this.$Cookie.remove("tb_refresh_token");
+        this.$refs.loginBox &&
+          this.$refs.loginBox.handleLogin((token) => {
+            this.loading = false;
+            this.initWS(token);
+          });
+      });
+  },
+  methods: {
+    toShowMain({ token }) {
+      this.access_token = token;
+    },
+    initWS(token) {
+      const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
+      const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
+      const tenantId = this.$store.getters.tenantId;
+      if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
+        this.$message &&
+          this.$message.error &&
+          this.$message.error(
+            "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId和gatewayId"
+          );
+        this.access_token = "";
+        this.$Cookie.remove("tb_access_token");
+        this.$Cookie.remove("tb_refresh_token");
+        return;
         }
         this.$tbWs.send({
           authCmd: {
             cmdId: 0,
-            token: newVal,
+          token,
           },
           cmds: [
             {
@@ -173,5 +227,34 @@ body {
 
 [class$="-zh"] {
   font-size: 1.2rem;
+}
+
+.fullscreen-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.loader {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #409eff;
+  border-top: 6px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -23,14 +23,15 @@ export async function login(username, password) {
  * 刷新 ThingsBoard token
  * @returns {Promise<{token: string, refreshToken: string}>}
  */
-export async function refreshToken() {
+export function refreshToken() {
   const refreshToken = Cookies.get("tb_refresh_token");
   if (!refreshToken) {
-    throw new Error("No refresh token found");
+    return Promise.reject(new Error("No refresh token found"));
   }
-  const res = await instance.post("/api/auth/token", { refreshToken });
-  const { token, refreshToken: newRefreshToken } = res.data;
-  Cookies.set("tb_access_token", token);
-  Cookies.set("tb_refresh_token", newRefreshToken);
-  return { token, refreshToken: newRefreshToken };
+  return instance.post("/api/auth/token", { refreshToken }).then((res) => {
+    const { token, refreshToken: newRefreshToken } = res.data;
+    Cookies.set("tb_access_token", token);
+    Cookies.set("tb_refresh_token", newRefreshToken);
+    return { token, refreshToken: newRefreshToken };
+  });
 }

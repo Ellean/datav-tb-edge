@@ -20,6 +20,7 @@ class TbWsInstance {
       this.connected = true;
       // 连接建立后，发送队列中的所有消息
       while (this.queue.length > 0) {
+        console.log("Sending queued message");
         const msg = this.queue.shift();
         this.ws.send(JSON.stringify(msg));
       }
@@ -48,8 +49,10 @@ class TbWsInstance {
 
   send(msg) {
     if (this.connected) {
+      console.log("WebSocket sending message", msg);
       this.ws.send(JSON.stringify(msg));
     } else {
+      console.log("WebSocket not connected, queuing message", msg);
       this.queue.push(msg);
     }
   }

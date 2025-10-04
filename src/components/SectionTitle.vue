@@ -27,7 +27,7 @@ export default {
   margin-bottom: 16px;
   text-align: left;
   padding: 8px 60px;
-  background: url("@/assets/images/bg_title.svg") left / cover no-repeat;
+  background: url("@/assets/images/bg_title.png") left / cover no-repeat;
 
   .zh,
   .en {

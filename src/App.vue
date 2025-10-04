@@ -190,8 +190,10 @@ body {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: url("@/assets/images/bg_2.svg") bottom / 100% 60% no-repeat,
-    url("@/assets/images/bg_1.svg") top / 200% 100% no-repeat, #193281;
+  background: url("@/assets/images/bg_2.png") bottom 7vh left 0px / contain
+      no-repeat,
+    url("@/assets/images/bg_1.png") top 17vh left 0px / contain no-repeat,
+    #193281;
   &::after {
     content: ""; /* 必须设置内容 */
     position: absolute; /* 绝对定位 */

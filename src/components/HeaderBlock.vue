@@ -89,9 +89,9 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  background-image: url("@/assets/images/bg_header.svg");
-  background-position: 0px -12px;
-  background-size: 100% 100%;
+  background-image: url("@/assets/images/bg_header.png");
+  background-position: 0px 12px;
+  background-size: contain;
   background-repeat: no-repeat;
 }
 
@@ -106,7 +106,7 @@ export default {
   .icon {
     width: 80px;
     aspect-ratio: 1 / 1;
-    background: url("@/assets/icons/site.svg") center / contain no-repeat;
+    background: url("@/assets/icons/site.png") center / contain no-repeat;
   }
 
   .site-info {
@@ -133,9 +133,9 @@ export default {
     margin-left: auto;
     width: 154px;
     height: 48px;
-    background: url("@/assets/images/legend_vacant.svg") left / contain
+    background: url("@/assets/images/legend_vacant.png") left / contain
         no-repeat,
-      url("@/assets/images/legend_occupied.svg") right / contain no-repeat;
+      url("@/assets/images/legend_occupied.png") right / contain no-repeat;
   }
 }
 </style>

@@ -153,7 +153,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  margin-top: 9vh;
+  margin-top: 5.8vh;
   padding: 12px;
   box-shadow: 0px 0px 15px 4px #265fbc inset;
   position: relative;

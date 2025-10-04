@@ -62,7 +62,7 @@
               height: '100%',
               background: `center / contain url('/icons/${block.type}_${
                 STATE_MAP[getBlockState(block, index)]
-              }.svg') no-repeat`,
+              }.png') no-repeat`,
             }"
           ></div>
         </div>
@@ -477,9 +477,8 @@ export default {
   position: relative;
   margin-top: 2vh;
   background: url("@/assets/images/bg_map.png") center / cover no-repeat,
-    url("@/assets/images/entrance_arrow.svg") 60% 90% / 50px 100px no-repeat,
-    url("@/assets/images/exit_arrow.svg") 63% 100% / 50px 100px no-repeat,
-    #193281;
+    url("@/assets/images/entrance_arrow.png") 60% 90% / 50px 100px no-repeat,
+    url("@/assets/images/exit_arrow.png") 63% 100% / 50px 100px no-repeat;
 
   * {
     user-select: none;
@@ -542,7 +541,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px 0;
 
   .item {
     height: 100%;
@@ -552,7 +550,7 @@ export default {
     align-items: center;
     margin: 0 15px;
     border-radius: 16px;
-    padding: 20px;
+    padding: 8px 20px;
   }
 }
 /* 右键菜单样式美化 */

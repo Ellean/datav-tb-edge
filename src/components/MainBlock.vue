@@ -14,9 +14,9 @@
       style="
         padding: 12px 24px;
         box-shadow: 0px -4px 15px 15px #2b5dad inset;
-        position: relative;
+        position: absolute;
         left: -24px;
-        bottom: -12px;
+        bottom: -8px;
         height: 3vh;
         width: 100vw;
       "

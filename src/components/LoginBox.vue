@@ -87,14 +87,10 @@ export default {
     if (username && password) {
       this.username = username;
       this.password = password;
-      this.handleLogin();
     }
-    this.access_token = "";
-    this.$Cookie.remove("tb_access_token");
-    this.$Cookie.remove("tb_refresh_token");
   },
   methods: {
-    handleLogin() {
+    handleLogin(cb) {
       this.loginError = "";
       if (this.username && this.password) {
         this.loading = true;
@@ -107,6 +103,7 @@ export default {
               refreshToken,
               tenantId: this.tenantId,
             });
+            cb && cb(token);
           })
           .catch((err) => {
             // 处理登录失败

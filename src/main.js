@@ -24,7 +24,6 @@ const indoorEnvDeviceId =
 const ioStateDeviceId =
   process.env.VUE_APP_IO_STATE_DEVICE_ID || getQueryParam("ioStateDeviceId");
 const tenantId = process.env.VUE_APP_TENANT_ID || getQueryParam("tenantId");
-const gatewayId = process.env.VUE_APP_GATEWAY_ID || getQueryParam("gatewayId");
 if (tenantId) {
   store.commit("SET_TENANT_ID", tenantId);
 }

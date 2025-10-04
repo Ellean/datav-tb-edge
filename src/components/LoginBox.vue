@@ -76,22 +76,16 @@ export default {
       },
       btnHighlight: { x: "100%", y: "100%", active: false },
       loginError: "",
-      tenantId: "",
     };
   },
   mounted() {
-    // 从 URL 查询参数读取账号密码
-    const params = new URLSearchParams(window.location.search);
-    const username = params.get("username");
-    const password = params.get("password");
-    if (username && password) {
-      this.username = username;
-      this.password = password;
-    }
+    this.username = this.$store.getters.tenantUsername;
+    this.password = this.$store.getters.tenantPassword;
   },
   methods: {
     handleLogin(cb) {
       this.loginError = "";
+      console.log("Attempting login with", this.username, this.password);
       if (this.username && this.password) {
         this.loading = true;
         login(this.username, this.password)
@@ -101,7 +95,6 @@ export default {
             this.$emit("login-success", {
               token,
               refreshToken,
-              tenantId: this.tenantId,
             });
             cb && cb(token);
           })

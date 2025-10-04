@@ -15,6 +15,8 @@ export default new Vuex.Store({
     ioStateDeviceId: "", // 新增：IO状态设备ID
     tenantId: "", // 新增：边缘设备ID
     tenantData: {}, // 新增：租户数据
+    tenantUsername: "", // 新增：租户用户名
+    tenantPassword: "", // 新增：租户密码
   },
   getters: {
     visitorCount: (state) => state.visitorCount,
@@ -87,6 +89,8 @@ export default new Vuex.Store({
         return "";
       }
     },
+    tenantUsername: (state) => state.tenantUsername,
+    tenantPassword: (state) => state.tenantPassword,
   },
   mutations: {
     SET_MESSAGE(state, message) {
@@ -107,6 +111,10 @@ export default new Vuex.Store({
     SET_TENANT_DATA(state, data) {
       // data 是一个对象，包含了最新的租户数据
       state.tenantData = data;
+    },
+    SET_TENANT_CREDENTIALS(state, { username, password }) {
+      state.tenantUsername = username;
+      state.tenantPassword = password;
     },
   },
   actions: {

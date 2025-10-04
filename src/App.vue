@@ -37,20 +37,18 @@ export default {
       loading: true, // 控制全屏加载动画显示
     };
   },
-  watch: {
-    access_token(newVal) {
-      if (newVal) {
-        const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
-        const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
-        const tenantId = this.$store.getters.tenantId;
+  mounted() {
+    // 校验必要参数
+    const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
+    const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
+    const tenantId = this.$store.getters.tenantId;
     if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
       this.disabled = true;
-      this.loading = false;
-          this.$message &&
-            this.$message.error &&
-            this.$message.error(
-              "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId"
-            );
+      this.$message &&
+        this.$message.error &&
+        this.$message.error(
+          "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId"
+        );
       return;
     }
     refreshToken()
@@ -72,11 +70,15 @@ export default {
         this.access_token = "";
         this.$Cookie.remove("tb_access_token");
         this.$Cookie.remove("tb_refresh_token");
-        this.$refs.loginBox &&
-          this.$refs.loginBox.handleLogin((token) => {
-            this.loading = false;
-            this.initWS(token);
-          });
+        this.$nextTick(() => {
+          const loginBox = this.$refs.loginBox;
+          console.log("触发登录", loginBox);
+          loginBox &&
+            loginBox.handleLogin((token) => {
+              this.loading = false;
+              this.initWS(token);
+            });
+        });
       });
   },
   methods: {
@@ -97,63 +99,43 @@ export default {
         this.$Cookie.remove("tb_access_token");
         this.$Cookie.remove("tb_refresh_token");
         return;
-        }
-        this.$tbWs.send({
-          authCmd: {
-            cmdId: 0,
-          token,
-          },
-          cmds: [
-            {
-              type: "TIMESERIES",
-              entityType: "DEVICE",
-              entityId: indoorEnvDeviceId,
-              scope: "LATEST_TELEMETRY",
-              cmdId: 1,
-            },
-            {
-              type: "TIMESERIES",
-              entityType: "DEVICE",
-              entityId: ioStateDeviceId,
-              scope: "LATEST_TELEMETRY",
-              cmdId: 2,
-            },
-            {
-              type: "ATTRIBUTES",
-              entityType: "DEVICE",
-              entityId: ioStateDeviceId,
-              scope: "SERVER_SCOPE",
-              cmdId: 3,
-            },
-            {
-              type: "ATTRIBUTES",
-              entityType: "TENANT",
-              entityId: tenantId,
-              scope: "SERVER_SCOPE",
-              cmdId: 4,
-            },
-          ],
-        });
       }
-    },
-  },
-  async mounted() {
-    // 校验必要参数
-    const indoorEnvDeviceId = this.$store.getters.indoorEnvDeviceId;
-    const ioStateDeviceId = this.$store.getters.ioStateDeviceId;
-    const tenantId = this.$store.getters.tenantId;
-    if (!indoorEnvDeviceId || !ioStateDeviceId || !tenantId) {
-      this.disabled = true;
-      this.$message &&
-        this.$message.error &&
-        this.$message.error(
-          "缺少必要设备ID参数，请通过URL传入indoorEnvDeviceId和ioStateDeviceId和tenantId"
-        );
-      return;
-    }
-    const { token } = await refreshToken();
-    this.access_token = token;
-    if (this.access_token) {
+      this.$tbWs.send({
+        authCmd: {
+          cmdId: 0,
+          token,
+        },
+        cmds: [
+          {
+            type: "TIMESERIES",
+            entityType: "DEVICE",
+            entityId: indoorEnvDeviceId,
+            scope: "LATEST_TELEMETRY",
+            cmdId: 1,
+          },
+          {
+            type: "TIMESERIES",
+            entityType: "DEVICE",
+            entityId: ioStateDeviceId,
+            scope: "LATEST_TELEMETRY",
+            cmdId: 2,
+          },
+          {
+            type: "ATTRIBUTES",
+            entityType: "DEVICE",
+            entityId: ioStateDeviceId,
+            scope: "SERVER_SCOPE",
+            cmdId: 3,
+          },
+          {
+            type: "ATTRIBUTES",
+            entityType: "TENANT",
+            entityId: tenantId,
+            scope: "SERVER_SCOPE",
+            cmdId: 4,
+          },
+        ],
+      });
       this.tbWsListener = {
         onmessage: (msg) => {
           // 只处理 subscriptionId=3 且有 visitor_count 的 ws 数据
@@ -171,15 +153,6 @@ export default {
         },
       };
       this.$tbWs.addListener(this.tbWsListener);
-    } else {
-      this.access_token = "";
-      this.$Cookie.remove("tb_access_token");
-      this.$Cookie.remove("tb_refresh_token");
-    }
-  },
-  methods: {
-    toShowMain({ token }) {
-      this.access_token = token;
     },
   },
   beforeDestroy() {

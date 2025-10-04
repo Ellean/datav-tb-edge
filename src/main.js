@@ -24,6 +24,8 @@ const indoorEnvDeviceId =
 const ioStateDeviceId =
   process.env.VUE_APP_IO_STATE_DEVICE_ID || getQueryParam("ioStateDeviceId");
 const tenantId = process.env.VUE_APP_TENANT_ID || getQueryParam("tenantId");
+const username = process.env.VUE_APP_USERNAME || getQueryParam("username");
+const password = process.env.VUE_APP_PASSWORD || getQueryParam("password");
 if (tenantId) {
   store.commit("SET_TENANT_ID", tenantId);
 }
@@ -32,6 +34,9 @@ if (indoorEnvDeviceId) {
 }
 if (ioStateDeviceId) {
   store.commit("SET_IO_STATE_DEVICE_ID", ioStateDeviceId);
+}
+if (username && password) {
+  store.commit("SET_TENANT_CREDENTIALS", { username, password });
 }
 
 new Vue({

@@ -157,10 +157,10 @@ export default {
             cmdId: 1,
           },
           {
-            type: "TIMESERIES",
+            type: "ATTRIBUTES",
             entityType: "DEVICE",
             entityId: ioStateDeviceId,
-            scope: "LATEST_TELEMETRY",
+            scope: "CLIENT_SCOPE",
             cmdId: 2,
           },
           {

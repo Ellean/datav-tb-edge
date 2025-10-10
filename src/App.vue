@@ -108,6 +108,8 @@ export default {
         }
       })
       .catch((err) => {
+        // 加载完成后关闭 loading
+        this.loading = false;
         console.error("刷新 token 失败，重新登录", err);
         this.access_token = "";
         this.$Cookie.remove("tb_access_token");
@@ -117,7 +119,6 @@ export default {
           console.log("触发登录", loginBox);
           loginBox &&
             loginBox.handleLogin((token) => {
-              this.loading = false;
               this.initWS(token);
             });
         });

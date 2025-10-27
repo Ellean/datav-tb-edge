@@ -105,6 +105,9 @@ export default new Vuex.Store({
         JSON.parse(state.gatewayData.additionalInfo || "{}").staffList || []
       );
     },
+    adImage: (state) => {
+      return state.gatewayData.ad || "";
+    },
     location: (state) => state.gatewayData.location, // 默认嵊州
   },
   mutations: {

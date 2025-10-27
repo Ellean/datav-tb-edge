@@ -1,12 +1,21 @@
 <template>
   <div class="billboard">
-    <img src="@/assets/images/ad.png" alt="Billboard Image" />
+    <img :src="image" alt="Billboard Image" />
   </div>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+import defaultImage from "@/assets/images/ad.png";
+
 export default {
   name: "BillBoard",
+  computed: {
+    ...mapGetters(["adImage"]),
+    image: function () {
+      return this.adImage || defaultImage;
+    },
+  },
 };
 </script>
 

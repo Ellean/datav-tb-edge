@@ -118,6 +118,12 @@ export default new Vuex.Store({
       return state.gatewayData.ad || "";
     },
     location: (state) => state.gatewayData.location, // 默认嵊州
+    brand: (state) => {
+      return state.gatewayData.brand || "乘云";
+    },
+    brandEn: (state) => {
+      return state.gatewayData.brandEn || "Cheng Yun";
+    },
   },
   mutations: {
     SET_MESSAGE(state, message) {

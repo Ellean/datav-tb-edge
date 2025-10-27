@@ -1,8 +1,8 @@
 <template>
   <div class="header-bar">
     <div class="header">
-      <div class="zh">乘云智慧驿站引导系统</div>
-      <div class="en">Cheng Yun Smart Station Guidance System</div>
+      <div class="zh">{{ brand }}智慧驿站引导系统</div>
+      <div class="en">{{ brandEn }} Smart Station Guidance System</div>
       <div class="message">{{ messageContent }}</div>
     </div>
     <div class="sub-header">
@@ -38,7 +38,7 @@ export default {
     ...mapState({
       message: "message",
     }),
-    ...mapGetters(["siteName", "siteNameEn"]),
+    ...mapGetters(["siteName", "siteNameEn", "brand", "brandEn"]),
   },
 };
 </script>

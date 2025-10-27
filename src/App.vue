@@ -4,6 +4,13 @@
     <div v-if="loading" class="fullscreen-loading">
       <div class="loader"></div>
     </div>
+    <!-- 全屏试用过期遮罩 -->
+    <div v-if="expired" class="fullscreen-expired">
+      <div class="expired-message">
+        <h2>试用已过期</h2>
+        <p>请联系管理员获取访问权限。</p>
+      </div>
+    </div>
     <LoginBox
       v-if="!access_token"
       ref="loginBox"
@@ -16,6 +23,8 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 import { refreshToken } from "@/api/auth";
 
 import HeaderBar from "./components/HeaderBlock.vue";
@@ -36,6 +45,9 @@ export default {
       tbWsListener: null,
       loading: true, // 控制全屏加载动画显示
     };
+  },
+  computed: {
+    ...mapGetters(["expired"]),
   },
   mounted() {
     // 输出当前浏览器的缩放比、视窗大小、字体大小（兼容安卓WebView，健壮性处理）
@@ -282,5 +294,27 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+.fullscreen-expired {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* 半透明底色以便 backdrop-filter 可见效果 */
+  background: rgba(0, 0, 0, 0.6);
+  /* 模糊背景（兼容 iOS / Safari） */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  color: white;
+  text-align: center;
+}
+.expired-message {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px 50px;
 }
 </style>

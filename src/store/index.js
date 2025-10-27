@@ -124,6 +124,9 @@ export default new Vuex.Store({
     brandEn: (state) => {
       return state.gatewayData.brandEn || "Cheng Yun";
     },
+    expired: (state) => {
+      return state.gatewayData.trialExpired === "true";
+    },
   },
   mutations: {
     SET_MESSAGE(state, message) {

@@ -6,9 +6,9 @@
     ></SectionTitle>
     <GlowBorder>
       <div class="grid">
-        <div class="good-value">100</div>
-        <div class="moderate-value">0</div>
-        <div class="bad-value">0</div>
+        <div class="good-value">{{ goodPercentage }}</div>
+        <div class="moderate-value">{{ moderatePercentage }}</div>
+        <div class="bad-value">{{ badPercentage }}</div>
         <div class="good">
           <div class="good-zh">好评</div>
           <div class="good-en">Good</div>
@@ -27,33 +27,49 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import SectionTitle from "./SectionTitle.vue";
 import GlowBorder from "./GlowBorder.vue";
+
 export default {
   name: "VisitorReview",
   components: {
     SectionTitle,
     GlowBorder,
   },
-  data() {
-    return {
-      good: 100,
-      moderate: 0,
-      bad: 0,
-    };
+  computed: {
+    ...mapGetters(["reviews"]),
+    reviewsCount() {
+      return this.reviews.good + this.reviews.moderate + this.reviews.bad || 0;
+    },
+    goodPercentage() {
+      return this.reviewsCount === 0
+        ? 0
+        : ((this.reviews.good / this.reviewsCount) * 100).toFixed(2);
+    },
+    moderatePercentage() {
+      return this.reviewsCount === 0
+        ? 0
+        : ((this.reviews.moderate / this.reviewsCount) * 100).toFixed(2);
+    },
+    badPercentage() {
+      return this.reviewsCount === 0
+        ? 0
+        : ((this.reviews.bad / this.reviewsCount) * 100).toFixed(2);
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .container {
-  width: 32vw;
+  width: 45vw;
 }
 
 .grid {
   padding: 0 2vw;
   display: grid;
-  grid-template-columns: 1.5fr 0.5fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 8px 0px;
   grid-auto-flow: row;
@@ -150,7 +166,7 @@ export default {
 [class$="-value"] {
   font-size: 1.6rem;
   font-weight: 700;
-  text-align: center;
+  text-align: right;
   &::after {
     content: " %";
   }

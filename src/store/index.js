@@ -105,6 +105,15 @@ export default new Vuex.Store({
         JSON.parse(state.gatewayData.additionalInfo || "{}").staffList || []
       );
     },
+    reviews: (state) => {
+      return (
+        JSON.parse(state.gatewayData.reviews || "{}") || {
+          good: 0,
+          moderate: 0,
+          bad: 0,
+        }
+      );
+    },
     adImage: (state) => {
       return state.gatewayData.ad || "";
     },

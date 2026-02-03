@@ -12,8 +12,9 @@ class TbWsInstance {
 
   connect() {
     // 请根据实际部署情况修改host和token获取方式
-    const host = process.env.VUE_APP_TB_EDGE_HOST || "100.84.125.65:8080";
-    const wsUrl = `ws://${host}/api/ws`;
+    const host =
+      process.env.VUE_APP_TB_EDGE_HOST || "wss://admin.restroom.cloud";
+    const wsUrl = `${host}/api/ws`;
     this.ws = new WebSocket(wsUrl);
 
     this.ws.onopen = () => {

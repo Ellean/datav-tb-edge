@@ -3,7 +3,7 @@ import { refreshToken } from "./auth";
 import Cookies from "js-cookie"; // 新增
 
 const BASE_URL =
-  "http://" + process.env.VUE_APP_TB_EDGE_HOST || "http://100.84.125.65:8080";
+  process.env.VUE_APP_TB_EDGE_HOST || "https://admin.restroom.cloud"; // 修改
 
 const instance = axios.create({
   baseURL: BASE_URL,

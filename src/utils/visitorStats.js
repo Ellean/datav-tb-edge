@@ -60,6 +60,28 @@ export function countMonth(visitorCount, year, month) {
 }
 
 /**
+ * 统计某年所有类型累加和
+ */
+export function countYear(visitorCount, year) {
+  const yearData = visitorCount[year];
+  if (!yearData) return 0;
+  return Object.values(yearData).reduce(
+    (sum, month) =>
+      sum +
+      Object.values(month).reduce(
+        (monthSum, day) =>
+          monthSum +
+          Object.values(day).reduce(
+            (s, v) => s + (Number.isFinite(Number(v)) ? Number(v) : 0),
+            0
+          ),
+        0
+      ),
+    0
+  );
+}
+
+/**
  * 统计总计所有类型累加和
  */
 export function countTotal(visitorCount) {
